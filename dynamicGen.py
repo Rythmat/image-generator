@@ -1,6 +1,6 @@
 import sys
 
-#parameters to indicate png size
+#parameters to indicate ppm size
 width = int(1280)
 height = int(1280)
 
