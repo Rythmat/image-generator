@@ -1,6 +1,6 @@
 import sys
 
-#parameters to indicate png size
+#parameters to indicate ppm size
 width = int(1280)
 height = int(1280)
 
@@ -23,7 +23,7 @@ q1 = []
 # sqMax = []
 
 
-#A function to dynamically change the color of the next square
+#A function to dynamically change the color of the next square/pixel
 rVal = 100
 gVal = 100
 bVal = 100
