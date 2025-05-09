@@ -29,15 +29,16 @@ gVal = 100
 bVal = 100
 def generateColor():
     global rVal, gVal, bVal
-    rVal = int(rVal*1.25)
-    bVal = int(bVal*1.5)
-    gVal *= int(gVal*1.66)
+    rVal += 5
     if(rVal>220):
         rVal = 50
-    if(gVal>220):
-        gVal = 50
+        bVal += 5
     if(bVal>220):
         bVal = 50
+        gVal += 5
+    if(gVal>220):
+        gVal = 50
+
     
 
 #Generates list of squares with corner and number determined by the number of divisions.
@@ -101,9 +102,6 @@ def mirrorColors():
         
 
 
-
-
-
 def printGrid():
     file = open('grid.ppm','w')
     sys.stdout = file
@@ -137,8 +135,7 @@ def printFun():
     for row in range(int(height)):
         for col in range(int(width)):
             print(f"{rVal} {gVal} {bVal}\t",end='')
-            if(col%4==0):
-                generateColor()
+            generateColor()
     
 
 

@@ -1,4 +1,4 @@
-import sys
+import sys, math, random
 
 #parameters to indicate png size
 width = int(1280)
@@ -17,22 +17,45 @@ sqCol = []
 q1 = []
 
 
-# A color key with the RBG values where 0 is white, 1 is black, 2 is green, and 3 is red
+# A color key with the RBG values where 0 is white, 1 is black/brown, 2 is green, and 3 is red
 colorKey = {
         0: '255 255 255\t',
-        1: '0 0 0\t',
-        2: '76 153 0\t',
-        3: '153 76 0\t'
+        1: '98 73 45\t',
+        2: '47 75 38\t',
+        3: '107 5 4\t'
 }
+
 # The squares in the first quadrant specified to be a certain color
-blacks = [103,118,88,69,55,100,54,84,35,24,114,18,19,34,22,82]
-whites = [120,72,117,86,39,99,52,53,68,7,97,1,3,33,81,6]
-reds = [104,87,101,70,56,115,36,37,83,8,98,4,5,50,66,2]
-greens = [119,102,71,85,116,40,51,67,38,23,113,20,21,49,65,17]
+whites = []
+blacks = []
+greens = []
+reds = []
+# Default Standard
+# whites = [120,72,117,86,39,99,52,53,68,7,97,1,3,33,81,6]
+# blacks = [103,118,88,69,55,100,54,84,35,24,114,18,19,34,22,82]
+# greens = [119,102,71,85,116,40,51,67,38,23,113,20,21,49,65,17]
+# reds = [104,87,101,70,56,115,36,37,83,8,98,4,5,50,66,2]
+
+def genColors():
+    whites.clear()
+    blacks.clear()
+    greens.clear()
+    reds.clear()
+    for i in range(16):
+        base = 2*i + 24*math.floor(i/4)
+        bases = [base+1, base+2, base+17, base+18]
+        random.shuffle(bases)
+        whites.append(bases[0])
+        blacks.append(bases[1])
+        greens.append(bases[2])
+        reds.append(bases[3])
 
 
 #Generates list of squares with corner and number determined by the number of divisions.
 def genSquares():
+        sqCol.clear()
+        q1.clear()
+        sqList.clear()
         numSquares = div*div
         for i in range(1, numSquares+1):
             #If the square is in the last column: special casing
@@ -92,28 +115,30 @@ def mirrorColors():
                 continue
 
 
-
+#Populates a file with the completed grid of RGB values
 def printGrid():
-    outFile = open('grid.ppm','w')
-    sys.stdout = outFile
-    start = 0
-    print('P3')
-    print(width,height)
-    print('255')
-    while(start<255):
-        colors = []
-        for i in range(start, start+div):
-            colors.append(sqCol[i][0])
-        for row in range(int(height/div)):
-            for c in colors:
-                for col in range(int(width/div)):
-                    print(colorKey[c],end='')
-            print('')
-        start += div
+    with open('grid.ppm', 'w') as outFile:
+        outFile.write('P3\n')
+        outFile.write(f'{width} {height}\n')
+        outFile.write('255\n')
 
-    
+        start = 0
+        while start < 255:
+            colors = [sqCol[i][0] for i in range(start, start + div)]
+            for _ in range(height // div):
+                line = ''
+                for c in colors:
+                    line += colorKey[c] * (width // div)
+                outFile.write(line + '\n')
+            start += div
 
 
-genSquares()
-mirrorColors()
-printGrid()
+#Runs everything necessary to produce a new unique grid image file 
+def runGridGen():
+    genColors()
+    genSquares()
+    mirrorColors()
+    printGrid()
+
+if __name__ == "__main__":
+    runGridGen()
