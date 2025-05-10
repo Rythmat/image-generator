@@ -2,8 +2,8 @@ import sys, math, random, os, time
 from PIL import Image, UnidentifiedImageError
 
 #parameters to indicate png size
-width = int(1280)
-height = int(1280)
+width = int(512)
+height = int(512)
 # Number of square per row and per column
 # div = 16
 # The pixel lengths of a square in the final image
