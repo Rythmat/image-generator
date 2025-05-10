@@ -39,6 +39,16 @@ reds = []
 # greens = [119,102,71,85,116,40,51,67,38,23,113,20,21,49,65,17]
 # reds = [104,87,101,70,56,115,36,37,83,8,98,4,5,50,66,2]
 
+
+def makeColorKey():
+    red = [random.randint(180,255),random.randint(0, 60), random.randint(0, 60) ]
+    green = [random.randint(0, 80), random.randint(160, 255), random.randint(0, 80)]
+    dark = [random.randint(80, 120), random.randint(50, 90), random.randint(30, 60)]
+    light = [random.randint(220, 255), random.randint(220, 255), random.randint(220, 255)]
+    global colorKey
+    colorKey.update({0:f'{light[0]} {light[1]} {light[2]}\t', 1:f'{dark[0]} {dark[1]} {dark[2]}\t', 2:f'{green[0]} {green[1]} {green[2]}\t', 3:f'{red[0]} {red[1]} {red[2]}\t' })
+
+
 def genColors(div):
     whites.clear()
     blacks.clear()
@@ -164,6 +174,7 @@ def runGridGen():
     global xLen, yLen
     xLen = int(width/div)
     yLen = int(height/div)
+    makeColorKey()
     genColors(div)
     genSquares(div)
     mirrorColors(div)
