@@ -7,7 +7,7 @@ function App() {
   useEffect(() => {
     const updateImage = () => {
       const timestamp = new Date().getTime();
-      setImageSrc(`http://localhost:5000/generate?${timestamp}`)
+      setImageSrc(`https://earth-mandalate.onrender.com/generate?${timestamp}`)
     };
 
     updateImage();

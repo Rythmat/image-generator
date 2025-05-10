@@ -4,7 +4,7 @@ from PIL import Image, UnidentifiedImageError
 #parameters to indicate png size
 width = int(512)
 height = int(512)
-# Number of square per row and per column
+# Number of square per row and per column is div
 # div = 16
 # The pixel lengths of a square in the final image
 xLen = int()
