@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 
 function App() {
   const [imageSrc, setImageSrc] = useState(null);
-  const [nextImage, setNextImage] = useState(null);
   
   useEffect(() => {
     const updateImage = () => {
@@ -15,12 +14,15 @@ function App() {
         setImageSrc(url);
       };
 
+      img.onerror = () => {
+        console.error("Image failed to load:", url);
+      };
+
       img.src = url;
-      setNextImageUrl(url);
     };
 
     updateImage();
-    const interval = setInterval(updateImage, 10000);
+    const interval = setInterval(updateImage, 5000);
     return () => clearInterval(interval);
   }, []);
 
