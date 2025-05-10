@@ -1,13 +1,14 @@
-import sys, math, random
+import sys, math, random, os, time
+from PIL import Image, UnidentifiedImageError
 
 #parameters to indicate png size
 width = int(1280)
 height = int(1280)
 # Number of square per row and per column
-div = 16
+# div = 16
 # The pixel lengths of a square in the final image
-xLen = int(width/div)
-yLen = int(height/div)
+xLen = int()
+yLen = int()
 
 #list of tuples containing the square number, the x coordinate of the starting corner, and the y coordinate of the starting corner
 sqList = []
@@ -36,14 +37,14 @@ reds = []
 # greens = [119,102,71,85,116,40,51,67,38,23,113,20,21,49,65,17]
 # reds = [104,87,101,70,56,115,36,37,83,8,98,4,5,50,66,2]
 
-def genColors():
+def genColors(div):
     whites.clear()
     blacks.clear()
     greens.clear()
     reds.clear()
-    for i in range(16):
-        base = 2*i + 24*math.floor(i/4)
-        bases = [base+1, base+2, base+17, base+18]
+    for i in range(int(div*div/16)):
+        base = 2*i + int(1.5*div*math.floor(i*4/div))
+        bases = [base+1, base+2, base+div+1, base+div+2]
         random.shuffle(bases)
         whites.append(bases[0])
         blacks.append(bases[1])
@@ -52,7 +53,7 @@ def genColors():
 
 
 #Generates list of squares with corner and number determined by the number of divisions.
-def genSquares():
+def genSquares(div):
         sqCol.clear()
         q1.clear()
         sqList.clear()
@@ -72,14 +73,14 @@ def genSquares():
                 yco = ((int)(i/div))*yLen
                 if (i/div) < (div/2):
                     yco += yLen
-                if (i%div) > (div/2):
-                    xco += -1*(xLen)
+                if ((i%div) > (div/2)) or (i%div==0):
+                    xco -= xLen
             #Centering around a coordinate rather than propogating from a corner 
             yco += -1*yLen*(div/2)
             xco += -1*xLen*(div/2)
             yco *= -1
             sqList.append((i, xco, yco))
-            if( (i%div<=8) and (int(i/div)<8)):
+            if( (i%div<=int(div/2)) and (int(i/div)<int(div/2))):
                 if i in blacks:
                     q1.append((i,1))
                     continue
@@ -103,27 +104,35 @@ def findInd(squareNum,list):
 
 
 #Populates the color pattern from the first quadrant in a mirrored fashion across the quadrants
-def mirrorColors():
+def mirrorColors(div):
     for pos in q1:
-        for i,sq in enumerate(sqList):
-            xco = sqList[findInd(pos[0],sqList)][1]
-            yco = sqList[findInd(pos[0],sqList)][2]
-            if((abs(sq[1]))==(abs(xco)) and (abs(sq[2]))==(abs(yco))):
-                temp = list(sq)
-                temp[0] = pos[1]
-                sqCol[i] = tuple(temp)
-                continue
+        sq1 = pos[0]
+        sq2 = pos[0] + div - 2 * (pos[0]%div) + 1
+        sq3 = div*div - div*(math.floor(pos[0]/div)+1) + pos[0]%div
+        sq4 = div*div - div*(math.floor(pos[0]/div)+1) + pos[0]%div + div - 2 * (pos[0]%div) + 1
+        sqCol[sq1-1] = (pos[1], sqList[findInd(sq1,sqList)][1],sqList[findInd(sq1,sqList)][2])
+        sqCol[sq2-1] = (pos[1], sqList[findInd(sq2,sqList)][1],sqList[findInd(sq2,sqList)][2])
+        sqCol[sq3-1] = (pos[1], sqList[findInd(sq3,sqList)][1],sqList[findInd(sq3,sqList)][2])
+        sqCol[sq4-1] = (pos[1], sqList[findInd(sq4,sqList)][1],sqList[findInd(sq4,sqList)][2])
+        # xco = sqList[findInd(pos[0],sqList)][1]
+        # yco = sqList[findInd(pos[0],sqList)][2]
+        # for i,sq in enumerate(sqList):
+        #     if((abs(sq[1]))==(abs(xco)) and (abs(sq[2]))==(abs(yco))):
+        #         temp = list(sq)
+        #         temp[0] = pos[1]
+        #         sqCol[i] = tuple(temp)
+        #         continue
 
 
 #Populates a file with the completed grid of RGB values
-def printGrid():
+def printGrid(div):
     with open('grid.ppm', 'w') as outFile:
         outFile.write('P3\n')
         outFile.write(f'{width} {height}\n')
         outFile.write('255\n')
 
         start = 0
-        while start < 255:
+        while start < div*div-1:
             colors = [sqCol[i][0] for i in range(start, start + div)]
             for _ in range(height // div):
                 line = ''
@@ -132,13 +141,35 @@ def printGrid():
                 outFile.write(line + '\n')
             start += div
 
+        outFile.flush()
+        os.fsync(outFile.fileno())
+    for _ in range(20):
+        try:
+            with Image.open('grid.ppm') as img:
+                img.load()
+                img.save('grid.png')
+            break
+        except (UnidentifiedImageError, ValueError, OSError):
+            time.sleep(0.1)
+    os.remove('grid.ppm')
+
 
 #Runs everything necessary to produce a new unique grid image file 
 def runGridGen():
-    genColors()
-    genSquares()
-    mirrorColors()
-    printGrid()
+    divs = [8,16,64,128]
+    random.shuffle(divs)
+    div = divs[0]
+    global xLen, yLen
+    xLen = int(width/div)
+    yLen = int(height/div)
+    genColors(div)
+    genSquares(div)
+    mirrorColors(div)
+    for tup in sqCol:
+        if(tup[0]>3):
+            print(tup)
+    printGrid(div)
+
 
 if __name__ == "__main__":
     runGridGen()

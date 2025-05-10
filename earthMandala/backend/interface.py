@@ -15,7 +15,7 @@ def imageLoop():
         # Wait until image is ready
         while True:
             try:
-                with Image.open("grid.ppm") as img:
+                with Image.open("grid.png") as img:
                     img.load()
                     resized = img.resize((300, 300))
                 break
