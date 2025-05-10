@@ -3,11 +3,20 @@ import { useEffect, useState } from "react";
 
 function App() {
   const [imageSrc, setImageSrc] = useState(null);
+  const [nextImage, setNextImage] = useState(null);
   
   useEffect(() => {
     const updateImage = () => {
       const timestamp = new Date().getTime();
-      setImageSrc(`https://earth-mandalate.onrender.com/generate?${timestamp}`)
+      const url = `https://earth-mandalate.onrender.com/generate?${timestamp}`;
+      const img = new Image();
+
+      img.onload = () => {
+        setImageSrc(url);
+      };
+
+      img.src = url;
+      setNextImageUrl(url);
     };
 
     updateImage();
@@ -18,7 +27,7 @@ function App() {
 
   return (
     <>
-      <div style={{ height: "100vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+      <div className="container">
       {imageSrc && <img src={imageSrc} alt="Earth Mandala"/>}
     </div>
     </>
