@@ -16,6 +16,7 @@ function App() {
 
       img.onerror = () => {
         console.error("Image failed to load:", url);
+        setTimeout(updateImage, 2000);
       };
 
       img.src = url;

@@ -137,8 +137,9 @@ def mirrorColors(div):
 
 
 #Populates a file with the completed grid of RGB values
-def printGrid(div):
-    with open('grid.ppm', 'w') as outFile:
+def printGrid(div, output="grid.png"):
+    ppm = output.replace(".png", "ppm")
+    with open(ppm, 'w') as outFile:
         outFile.write('P3\n')
         outFile.write(f'{width} {height}\n')
         outFile.write('255\n')
@@ -157,18 +158,18 @@ def printGrid(div):
         os.fsync(outFile.fileno())
     for _ in range(20):
         try:
-            with Image.open('grid.ppm') as img:
+            with Image.open(ppm) as img:
                 img.load()
-                img.save('grid.png')
+                img.save(output)
             break
         except (UnidentifiedImageError, ValueError, OSError):
             time.sleep(0.1)
-    os.remove('grid.ppm')
+    os.remove(ppm)
 
 
 #Runs everything necessary to produce a new unique grid image file 
-def runGridGen():
-    divs = [8,16,64,128]
+def runGridGen(output="grid.png"):
+    divs = [8,16,64]
     random.shuffle(divs)
     div = divs[0]
     global xLen, yLen
@@ -181,7 +182,7 @@ def runGridGen():
     for tup in sqCol:
         if(tup[0]>3):
             print(tup)
-    printGrid(div)
+    printGrid(div, output)
 
 
 if __name__ == "__main__":
