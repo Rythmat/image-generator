@@ -5,41 +5,6 @@ from PIL import Image, UnidentifiedImageError
 width = int(512)
 height = int(512)
 
-# Number of square per row and per column is div
-# div = 16
-
-# The pixel lengths of a square in the final image
-# xLen = int()
-# yLen = int()
-
-#list of tuples containing the square number, the x coordinate of the starting corner, and the y coordinate of the starting corner
-sqList = []
-#list of tuples containing the specified color, the x coordinate of the starting corner, and the y coordinate of the starting corner 
-sqCol = []
-#list of tuples containing the square number, and its specified color
-q1 = []
-
-
-# A color key with the RBG values where 0 is white, 1 is black/brown, 2 is green, and 3 is red
-# colorKey = {
-#         0: '255 255 255\t',
-#         1: '98 73 45\t',
-#         2: '47 75 38\t',
-#         3: '107 5 4\t'
-# }
-
-# The squares in the first quadrant specified to be a certain color
-whites = []
-blacks = []
-greens = []
-reds = []
-# Default Standard
-# whites = [120,72,117,86,39,99,52,53,68,7,97,1,3,33,81,6]
-# blacks = [103,118,88,69,55,100,54,84,35,24,114,18,19,34,22,82]
-# greens = [119,102,71,85,116,40,51,67,38,23,113,20,21,49,65,17]
-# reds = [104,87,101,70,56,115,36,37,83,8,98,4,5,50,66,2]
-
-
 def makeColorKey():
     red = [random.randint(180,255),random.randint(0, 60), random.randint(0, 60) ]
     green = [random.randint(0, 80), random.randint(160, 255), random.randint(0, 80)]
@@ -48,26 +13,19 @@ def makeColorKey():
     return {0:f'{light[0]} {light[1]} {light[2]}\t', 1:f'{dark[0]} {dark[1]} {dark[2]}\t', 2:f'{green[0]} {green[1]} {green[2]}\t', 3:f'{red[0]} {red[1]} {red[2]}\t' }
 
 
-def genColors(div):
-    whites.clear()
-    blacks.clear()
-    greens.clear()
-    reds.clear()
+def genColors(div, colored):
     for i in range(int(div*div/16)):
         base = 2*i + int(1.5*div*math.floor(i*4/div))
         bases = [base+1, base+2, base+div+1, base+div+2]
         random.shuffle(bases)
-        whites.append(bases[0])
-        blacks.append(bases[1])
-        greens.append(bases[2])
-        reds.append(bases[3])
+        colored["whites"].append(bases[0])
+        colored["blacks"].append(bases[1])
+        colored["greens"].append(bases[2])
+        colored["reds"].append(bases[3])
 
 
 #Generates list of squares with corner and number determined by the number of divisions.
-def genSquares(div, xLen, yLen):
-        sqCol.clear()
-        q1.clear()
-        sqList.clear()
+def genSquares(div, xLen, yLen, sqList, sqCol, q1, colored):
         numSquares = div*div
         for i in range(1, numSquares+1):
             #If the square is in the last column: special casing
@@ -92,16 +50,16 @@ def genSquares(div, xLen, yLen):
             yco *= -1
             sqList.append((i, xco, yco))
             if( (i%div<=int(div/2)) and (int(i/div)<int(div/2))):
-                if i in blacks:
+                if i in colored["blacks"]:
                     q1.append((i,1))
                     continue
-                if i in whites:
+                if i in colored["whites"]:
                     q1.append((i,0))
                     continue
-                if i in reds:
+                if i in colored["reds"]:
                     q1.append((i,3))
                     continue
-                if i in greens:
+                if i in colored["greens"]:
                     q1.append((i,2))
                     continue
         for i in sqList:
@@ -115,7 +73,7 @@ def findInd(squareNum,list):
 
 
 #Populates the color pattern from the first quadrant in a mirrored fashion across the quadrants
-def mirrorColors(div):
+def mirrorColors(div,  sqList, sqCol, q1):
     for pos in q1:
         sq1 = pos[0]
         sq2 = pos[0] + div - 2 * (pos[0]%div) + 1
@@ -125,18 +83,9 @@ def mirrorColors(div):
         sqCol[sq2-1] = (pos[1], sqList[findInd(sq2,sqList)][1],sqList[findInd(sq2,sqList)][2])
         sqCol[sq3-1] = (pos[1], sqList[findInd(sq3,sqList)][1],sqList[findInd(sq3,sqList)][2])
         sqCol[sq4-1] = (pos[1], sqList[findInd(sq4,sqList)][1],sqList[findInd(sq4,sqList)][2])
-        # xco = sqList[findInd(pos[0],sqList)][1]
-        # yco = sqList[findInd(pos[0],sqList)][2]
-        # for i,sq in enumerate(sqList):
-        #     if((abs(sq[1]))==(abs(xco)) and (abs(sq[2]))==(abs(yco))):
-        #         temp = list(sq)
-        #         temp[0] = pos[1]
-        #         sqCol[i] = tuple(temp)
-        #         continue
-
 
 #Populates a file with the completed grid of RGB values
-def printGrid(div, colorKey, output="grid.png"):
+def printGrid(div, colorKey, sqCol, output="grid.png"):
     ppm = output.replace(".png", "ppm")
     with open(ppm, 'w') as outFile:
         outFile.write('P3\n')
@@ -168,19 +117,28 @@ def printGrid(div, colorKey, output="grid.png"):
 
 #Runs everything necessary to produce a new unique grid image file 
 def runGridGen(output="grid.png"):
+    sqList = []
+    sqCol = []
+    q1 = []
+    colored = {
+        'whites': [],
+        'blacks': [],
+        'greens': [],
+        'reds': []
+    }
     divs = [8,16,64]
     random.shuffle(divs)
     div = divs[0]
     xLen = int(width/div)
     yLen = int(height/div)
     colors = makeColorKey()
-    genColors(div)
-    genSquares(div, xLen, yLen)
-    mirrorColors(div)
+    genColors(div, colored)
+    genSquares(div, xLen, yLen, sqList, sqCol, q1, colored)
+    mirrorColors(div, sqList, sqCol, q1)
     for tup in sqCol:
         if(tup[0]>3):
             print(tup)
-    printGrid(div, colors, output)
+    printGrid(div, colors, sqCol, output)
 
 
 if __name__ == "__main__":
