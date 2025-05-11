@@ -10,7 +10,7 @@ def makeColorKey():
     green = [random.randint(0, 80), random.randint(160, 255), random.randint(0, 80)]
     dark = [random.randint(80, 120), random.randint(50, 90), random.randint(30, 60)]
     light = [random.randint(220, 255), random.randint(220, 255), random.randint(220, 255)]
-    return {0:f'{light[0]} {light[1]} {light[2]}\t', 1:f'{dark[0]} {dark[1]} {dark[2]}\t', 2:f'{green[0]} {green[1]} {green[2]}\t', 3:f'{red[0]} {red[1]} {red[2]}\t' }
+    return {0: '255 255 255\t', 1:f'{dark[0]} {dark[1]} {dark[2]}\t', 2:f'{green[0]} {green[1]} {green[2]}\t', 3:f'{red[0]} {red[1]} {red[2]}\t' }
 
 
 def genColors(div, colored):
@@ -126,7 +126,7 @@ def runGridGen(output="grid.png"):
         'greens': [],
         'reds': []
     }
-    divs = [8,16,64]
+    divs = [8,16,32]
     random.shuffle(divs)
     div = divs[0]
     xLen = int(width/div)
