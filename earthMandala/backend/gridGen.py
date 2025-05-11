@@ -9,8 +9,8 @@ height = int(512)
 # div = 16
 
 # The pixel lengths of a square in the final image
-xLen = int()
-yLen = int()
+# xLen = int()
+# yLen = int()
 
 #list of tuples containing the square number, the x coordinate of the starting corner, and the y coordinate of the starting corner
 sqList = []
@@ -21,12 +21,12 @@ q1 = []
 
 
 # A color key with the RBG values where 0 is white, 1 is black/brown, 2 is green, and 3 is red
-colorKey = {
-        0: '255 255 255\t',
-        1: '98 73 45\t',
-        2: '47 75 38\t',
-        3: '107 5 4\t'
-}
+# colorKey = {
+#         0: '255 255 255\t',
+#         1: '98 73 45\t',
+#         2: '47 75 38\t',
+#         3: '107 5 4\t'
+# }
 
 # The squares in the first quadrant specified to be a certain color
 whites = []
@@ -45,8 +45,7 @@ def makeColorKey():
     green = [random.randint(0, 80), random.randint(160, 255), random.randint(0, 80)]
     dark = [random.randint(80, 120), random.randint(50, 90), random.randint(30, 60)]
     light = [random.randint(220, 255), random.randint(220, 255), random.randint(220, 255)]
-    global colorKey
-    colorKey.update({0:f'{light[0]} {light[1]} {light[2]}\t', 1:f'{dark[0]} {dark[1]} {dark[2]}\t', 2:f'{green[0]} {green[1]} {green[2]}\t', 3:f'{red[0]} {red[1]} {red[2]}\t' })
+    return {0:f'{light[0]} {light[1]} {light[2]}\t', 1:f'{dark[0]} {dark[1]} {dark[2]}\t', 2:f'{green[0]} {green[1]} {green[2]}\t', 3:f'{red[0]} {red[1]} {red[2]}\t' }
 
 
 def genColors(div):
@@ -65,7 +64,7 @@ def genColors(div):
 
 
 #Generates list of squares with corner and number determined by the number of divisions.
-def genSquares(div):
+def genSquares(div, xLen, yLen):
         sqCol.clear()
         q1.clear()
         sqList.clear()
@@ -137,7 +136,7 @@ def mirrorColors(div):
 
 
 #Populates a file with the completed grid of RGB values
-def printGrid(div, output="grid.png"):
+def printGrid(div, colorKey, output="grid.png"):
     ppm = output.replace(".png", "ppm")
     with open(ppm, 'w') as outFile:
         outFile.write('P3\n')
@@ -172,17 +171,16 @@ def runGridGen(output="grid.png"):
     divs = [8,16,64]
     random.shuffle(divs)
     div = divs[0]
-    global xLen, yLen
     xLen = int(width/div)
     yLen = int(height/div)
-    makeColorKey()
+    colors = makeColorKey()
     genColors(div)
-    genSquares(div)
+    genSquares(div, xLen, yLen)
     mirrorColors(div)
     for tup in sqCol:
         if(tup[0]>3):
             print(tup)
-    printGrid(div, output)
+    printGrid(div, colors, output)
 
 
 if __name__ == "__main__":
