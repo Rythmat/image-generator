@@ -1,8 +1,8 @@
 import sys, math, random, os, time, copy
 from PIL import Image, ImageDraw, UnidentifiedImageError
 
-width = int(1024)
-height = int(1024)
+width = int(4096)
+height = int(4096)
 
 class Point:
   def __init__(self, x, y):
