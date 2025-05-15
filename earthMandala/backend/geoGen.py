@@ -180,8 +180,7 @@ def drawImage(fileName, regions):
         draw.polygon(region[i].xMirrored(), fill=colors[i])
         draw.polygon(region[i].yMirrored(), fill=colors[i])
         draw.polygon(region[i].flipped(), fill=colors[i])
-  # img.save(fileName,quality=80)
-  img.show()
+  img.save(fileName,quality=80)
 
 def runGenerate(output="mandala.png"):
     initialRectangle = Region([Point(0,0),Point(width/2,0),Point(width/2,height/2),Point(0,height/2)])
