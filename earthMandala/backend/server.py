@@ -1,6 +1,7 @@
 from flask import Flask, send_file, make_response
 from flask_cors import CORS
 import gridGen
+import geoGen
 import threading
 import time
 import os
@@ -24,7 +25,8 @@ executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
 def generate_async(filepath):
     try:
-        gridGen.runGridGen(filepath)
+        # gridGen.runGridGen(filepath)
+        geoGen.runGenerate(filepath)
         with queue_lock:
             image_queue.append(filepath)
             print(f"[+] Queued image: {filepath}")

@@ -2,14 +2,15 @@ import sys, math, random, os, time
 from PIL import Image, UnidentifiedImageError
 
 #parameters to indicate png size
-width = int(512)
-height = int(512)
+width = int(1024)
+height = int(1024)
 
 def makeColorKey():
     # red = [random.randint(180,255),random.randint(0, 60), random.randint(0, 60) ]
     # green = [random.randint(0, 80), random.randint(160, 255), random.randint(0, 80)]
     # dark = [random.randint(80, 120), random.randint(50, 90), random.randint(30, 60)]
     # light = [random.randint(220, 255), random.randint(220, 255), random.randint(220, 255)]
+    # fully random color generation
     red = [random.randint(0,255),random.randint(0, 255), random.randint(0, 255) ]
     green = [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
     dark = [random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)]
