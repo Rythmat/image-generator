@@ -44,6 +44,7 @@ img {
 
 @media (max-width: 768px) {
   .container {
+    display: flex;
     padding: 0;
     margin: 0;
     justify-content: center;
