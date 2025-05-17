@@ -184,7 +184,7 @@ class Region:
     if self.type=='tri':
       return self.oneTriSect()
     
-  def lastSect(self):
+  def lastSect(self, instance):
     if self.type=='rect':
       functs = [self.firstRectSect, self.secondRectSect, self.thirdRectSect, self.fourthRectSect]
       random.shuffle(functs)
@@ -228,7 +228,7 @@ def runGenerate(output, type):
       elif i == div-1:
         for list in thisSplit:
           for ent in list:
-            nextSplit.append(ent.quadrisect(i))
+            nextSplit.append(ent.lastSect(i))
         thisSplit=[copy.deepcopy(region) for region in nextSplit]
       else:
         for list in thisSplit:
@@ -268,4 +268,5 @@ def hardGen():
 
 if __name__ == "__main__":
     runGenerate("mandala.png", 'sixteens')
+    # runGenerate("mandala.png", "thirtytwos")
     # hardGen()
