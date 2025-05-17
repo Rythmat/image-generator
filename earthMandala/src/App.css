@@ -51,6 +51,7 @@ img {
     margin: 0;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     height: 100vh;
   }
 
