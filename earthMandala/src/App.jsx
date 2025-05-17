@@ -44,7 +44,7 @@ function App() {
   return (
     <>
       <div className="container">
-        <div className="side left">
+        <div className="side">
           <select onChange={(e) => setType(e.target.value)} value={type}>
             <option value="eights">Three Quadrisections</option>
             <option value="sixteens">Four Quadrisections</option>
