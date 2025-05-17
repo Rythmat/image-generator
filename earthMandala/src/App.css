@@ -66,8 +66,8 @@ img {
     justify-content: center;
     align-items: center;
     width: 100%;
-    margin-top: calc(100vh - 100vw)/4;
-    margin-bottom: calc(100vh - 100vw)/8;
+    margin-top: calc(25vh - 25vw);
+    margin-bottom: calc(13vh - 13vw);
   }
 
   img {
