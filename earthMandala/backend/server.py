@@ -1,6 +1,6 @@
-from flask import Flask, send_file, make_response
+from flask import Flask, send_file, make_response, request
 from flask_cors import CORS
-import gridGen
+# import gridGen
 import geoGen
 import threading
 import time
@@ -16,19 +16,34 @@ IMAGE_DIR = "images"
 os.makedirs(IMAGE_DIR, exist_ok=True)
 
 BUFFER_SIZE = 5 
-image_queue = deque()
+queues = {
+    "eights": deque(),
+    "sixteens": deque(),
+    "thirtytwos": deque()
+}
 queue_lock = threading.Lock()
-current_image = None
-recent_images = deque(maxlen=5) 
+current_images = {
+  "eights": None,
+  "sixteens": None,
+  "thirtytwos": None
+}
+
+recent_images = {
+  "eights": deque(maxlen=5),
+  "sixteens": deque(maxlen=5),
+  "thirtytwos": deque(maxlen=5)
+}
+
+deque(maxlen=5) 
 
 executor = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
-def generate_async(filepath):
+def generate_async(filepath, type):
     try:
         # gridGen.runGridGen(filepath)
-        geoGen.runGenerate(filepath)
+        geoGen.runGenerate(filepath, type)
         with queue_lock:
-            image_queue.append(filepath)
+            queues[type].append(filepath)
             print(f"[+] Queued image: {filepath}")
     except Exception as e:
         print(f"[!] Image generation failed: {e}")
@@ -36,24 +51,23 @@ def generate_async(filepath):
 def image_producer():
     while True:
         with queue_lock:
-            if len(image_queue) < BUFFER_SIZE:
-                filename = f"{IMAGE_DIR}/grid_{uuid.uuid4().hex}.png"
-                executor.submit(generate_async, filename)
+            for type, queue in queues.items():
+                if len(queue) < BUFFER_SIZE:
+                    filename = f"{IMAGE_DIR}/{type}_{uuid.uuid4().hex}.png"
+                    executor.submit(generate_async, filename, type)
         time.sleep(1)
 
-def image_rotator():
-    global current_image
+def image_rotator(type):
     while True:
         with queue_lock:
-            if image_queue:
-                old_image = current_image
-                current_image = image_queue.popleft()
-                recent_images.append(old_image)
-                print(f"[→] Rotated to: {current_image}")
-
-        with queue_lock:
-            while len(recent_images) > 2:
-                img_to_delete = recent_images.popleft()
+            queue = queues[type]
+            if queue:
+                old_image = current_images[type]
+                current_images[type] = queue.popleft()
+                recent_images[type].append(old_image)
+                print(f"[→] Rotated to: {current_images[type]}")
+            while len(recent_images[type]) > 2:
+                img_to_delete = recent_images[type].popleft()
                 if img_to_delete and os.path.exists(img_to_delete):
                     try:
                         os.remove(img_to_delete)
@@ -64,15 +78,19 @@ def image_rotator():
 
 @app.route("/generate")
 def generate():
+    q_type = request.args.get("type", "sixteens")
     with queue_lock:
-        if current_image and os.path.exists(current_image):
-            response = make_response(send_file(current_image, mimetype="image/png"))
-            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
-            return response
+        if q_type in current_images:
+            img = current_images[q_type]
+            if img and os.path.exists(img):
+                response = make_response(send_file(img, mimetype="image/png"))
+                response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+                return response
     return "No image ready yet", 503
 
 if __name__ == "__main__":
     threading.Thread(target=image_producer, daemon=True).start()
-    threading.Thread(target=image_rotator, daemon=True).start()
+    for qname in queues:
+        threading.Thread(target=image_rotator, args=(type,), daemon=True).start()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)

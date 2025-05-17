@@ -208,12 +208,18 @@ def drawImage(fileName, regions):
         draw.polygon(region[i].flipped(), fill=colors[i])
   img.save(fileName,quality=80)
 
-def runGenerate(output="mandala.png"):
+def runGenerate(output, type):
     initialRectangle = Region([Point(0,0),Point(width/2,0),Point(width/2,height/2),Point(0,height/2)])
     firstSplit = initialRectangle.fourthRectSect()
     thisSplit = firstSplit
     nextSplit = []
-    div = random.randint(2,3)
+    div = int()
+    if(type=="eights"):
+      div = 1
+    elif(type=="thirtytwos"):
+      div = 3
+    else:
+      div = 2
     for i in range(div):
       if i == 0:
         for ent in thisSplit:
@@ -261,5 +267,5 @@ def hardGen():
 
 
 if __name__ == "__main__":
-    runGenerate()
+    runGenerate("mandala.png", 'sixteens')
     # hardGen()
