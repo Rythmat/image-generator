@@ -44,6 +44,8 @@ def generate_async(filepath, type):
         geoGen.runGenerate(filepath, type)
         with queue_lock:
             queues[type].append(filepath)
+            if not current_images[type]:
+                current_images[type] = filepath
             print(f"[+] Queued image: {filepath}")
     except Exception as e:
         print(f"[!] Image generation failed: {e}")

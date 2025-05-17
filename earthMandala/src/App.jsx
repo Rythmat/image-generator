@@ -22,7 +22,7 @@ function App() {
       img.onerror = () => {
         console.error("Image failed to load:", url);
         if (!paused) {
-          setTimeout(updateImage, 2000);
+          setTimeout(updateImage, 500);
         }
       };
 
@@ -53,7 +53,7 @@ function App() {
         </div>
 
         <div className="center">
-          {imageSrc && <img src={imageSrc} alt="Earth Mandala" />}
+          {imageSrc ? <img src={imageSrc} alt="Earth Mandala" />: <p>Loading image...</p> }
         </div>
 
         <div className="side">
