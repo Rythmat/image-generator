@@ -90,7 +90,7 @@ def generate():
 
 if __name__ == "__main__":
     threading.Thread(target=image_producer, daemon=True).start()
-    for qname in queues:
+    for type in queues:
         threading.Thread(target=image_rotator, args=(type,), daemon=True).start()
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
