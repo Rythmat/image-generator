@@ -68,8 +68,8 @@ img {
 }
 
 .icon-button img {
-  width: 40px;
-  height: 40px;
+  width: 80px;
+  height: 80px;
   transition: transform 0.2s;
 }
 
