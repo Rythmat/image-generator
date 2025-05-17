@@ -27,6 +27,11 @@ class Point:
   
   def __truediv__(self,num):
     return Point(self.x/num, self.y/num)
+  
+  def midpoint(self, other):
+    xdiff = self.x - other.x
+    ydiff = self.y - other.y
+    return Point(other.x + xdiff/2, other.y + ydiff/2)
 
 
 class Region:
@@ -145,7 +150,27 @@ class Region:
     verts3 = [tip, start+edgeStep*2, start+edgeStep*3]
     verts4 = [tip, start+edgeStep*3, start+edgeStep*4]
     return[Region(verts1),Region(verts2),Region(verts3),Region(verts4)]
-
+  
+  def twoTriSect(self):
+    cent = self.rectBounds()[2]
+    edge1Mid = self.tip.midpoint(self.vertices[1])
+    edge2Mid = self.edge[0].midpoint(self.edge[1])
+    edge3Mid = self.tip.midpoint(self.vertices[2])
+    verts1 = [self.tip, edge1Mid, cent]
+    verts2 = [edge1Mid, self.vertices[1], edge2Mid, cent]
+    verts3 = [cent, edge2Mid, self.vertices[2], edge3Mid]
+    verts4 = [self.tip, cent, edge3Mid]
+    return [Region(verts1),Region(verts2),Region(verts3),Region(verts4)]
+  
+  def threeTriSect(self):
+    cent = self.rectBounds()[2]
+    edge1Mid = self.tip.midpoint(self.vertices[1])
+    edge3Mid = self.tip.midpoint(self.vertices[2])
+    verts1 = [self.tip, edge1Mid, cent, edge3Mid]
+    verts2 = [edge1Mid, self.vertices[1], cent]
+    verts3 = [cent, self.vertices[1], self.vertices[2]]
+    verts4 = [edge3Mid, cent, self.vertices[2]]
+    return [Region(verts1),Region(verts2),Region(verts3),Region(verts4)]
 
 
   def quadrisect(self, instance):
@@ -163,10 +188,11 @@ class Region:
     if self.type=='rect':
       functs = [self.firstRectSect, self.secondRectSect, self.thirdRectSect, self.fourthRectSect]
       random.shuffle(functs)
-      print(f'calling {functs[0]}')
       return functs[0]()
     if self.type=='tri':
-      return self.oneTriSect()
+      functs = [self.oneTriSect, self.twoTriSect]
+      random.shuffle(functs)
+      return functs[0]()
 
 
 def drawImage(fileName, regions):
@@ -187,11 +213,16 @@ def runGenerate(output="mandala.png"):
     firstSplit = initialRectangle.fourthRectSect()
     thisSplit = firstSplit
     nextSplit = []
-    div = random.randint(1,3)
+    div = random.randint(2,3)
     for i in range(div):
       if i == 0:
         for ent in thisSplit:
           nextSplit.append(ent.quadrisect(i))
+        thisSplit=[copy.deepcopy(region) for region in nextSplit]
+      elif i == div-1:
+        for list in thisSplit:
+          for ent in list:
+            nextSplit.append(ent.quadrisect(i))
         thisSplit=[copy.deepcopy(region) for region in nextSplit]
       else:
         for list in thisSplit:
@@ -202,5 +233,33 @@ def runGenerate(output="mandala.png"):
 
 
 
+def hardGen():
+  initialRectangle = Region([Point(0,0),Point(width/2,0),Point(width/2,height/2),Point(0,height/2)])
+  firstSplit = initialRectangle.fourthRectSect()
+  secondSplit = []
+  secondSplit.append(firstSplit[0].fourthRectSect())
+  secondSplit.append(firstSplit[1].fourthRectSect())
+  secondSplit.append(firstSplit[2].firstRectSect())
+  secondSplit.append(firstSplit[3].fourthRectSect())
+  # drawImage("mandala.png",secondSplit)
+  thirdSplit = []
+  thirdSplit.append(secondSplit[0][0].fourthRectSect())
+  thirdSplit.append(secondSplit[0][1].thirdRectSect())
+  thirdSplit.append(secondSplit[0][2].firstRectSect())
+  thirdSplit.append(secondSplit[0][3].secondRectSect())
+  for ent in secondSplit[2]:
+    thirdSplit.append(ent.oneTriSect())
+  thirdSplit.append(secondSplit[1][0].thirdRectSect())
+  thirdSplit.append(secondSplit[1][1].fourthRectSect())
+  thirdSplit.append(secondSplit[1][2].secondRectSect())
+  thirdSplit.append(secondSplit[1][3].firstRectSect())
+  thirdSplit.append(secondSplit[3][0].secondRectSect())
+  thirdSplit.append(secondSplit[3][1].firstRectSect())
+  thirdSplit.append(secondSplit[3][2].thirdRectSect())
+  thirdSplit.append(secondSplit[3][3].fourthRectSect())
+  drawImage("mandala.png", thirdSplit)
+
+
 if __name__ == "__main__":
     runGenerate()
+    # hardGen()

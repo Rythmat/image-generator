@@ -1,8 +1,8 @@
 from PIL import Image
  
-im1 = Image.open("grid1.png").convert('RGB')
+im1 = Image.open("mandala1.png").convert('RGB')
  
-im2 = Image.open("grid2.png").convert('RGB')
+im2 = Image.open("mandala2.png").convert('RGB')
  
 frames = [im1,im1,im1,im1,im1] 
 #100 frames of transform
