@@ -1,5 +1,7 @@
 import "./App.css";
 import { useEffect, useState, useRef } from "react";
+import pauseIcon from "./assets/pause.png"
+import playIcon from "./assets/play.png"
 
 function App() {
   const [imageSrc, setImageSrc] = useState(null);
@@ -42,17 +44,23 @@ function App() {
   return (
     <>
       <div className="container">
-        <select onChange={(e) => setType(e.target.value)} value={type}>
-          <option value="eights">Three Quadrisections</option>
-          <option value="sixteens">Four Quadrisections</option>
-          <option value="thirtytwos">Five Quadrisections</option>
-        </select>
+        <div className="side left">
+          <select onChange={(e) => setType(e.target.value)} value={type}>
+            <option value="eights">Three Quadrisections</option>
+            <option value="sixteens">Four Quadrisections</option>
+            <option value="thirtytwos">Five Quadrisections</option>
+          </select>
+        </div>
 
-        <button onClick={togglePause}>
-          {paused ? "Resume" : "Pause"}
-        </button>
+        <div className="center">
+          {imageSrc && <img src={imageSrc} alt="Earth Mandala" />}
+        </div>
 
-        {imageSrc && <img src={imageSrc} alt="Earth Mandala"/>}
+        <div className="side">
+          <button onClick={togglePause} className="icon-button">
+            <img src={paused ? playIcon : pauseIcon} alt={paused ? "Resume" : "Pause"} />
+          </button> 
+        </div>
       </div>
     </>
   )
