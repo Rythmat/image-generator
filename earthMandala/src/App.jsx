@@ -53,7 +53,7 @@ function App() {
         </div>
 
         <div className="center">
-          {imageSrc ? <img src={imageSrc} alt="Earth Mandala" />: <p>Loading image...</p> }
+          {imageSrc ? <img src={imageSrc} alt="Earth Mandala" />: <p>Images may take 1 minute to appear!</p> }
         </div>
 
         <div className="side">
