@@ -195,10 +195,11 @@ class Region:
       return functs[0]()
 
 
-def drawImage(fileName, regions):
+def drawImage(fileName, regions, colors=None):
   img = Image.new("RGB", (width, height), "white")
   draw = ImageDraw.Draw(img)
-  colors = [(255,255,255),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),(random.randint(0,255),random.randint(0,255),random.randint(0,255))]
+  if colors is None:
+    colors = [(255,255,255),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),(random.randint(0,255),random.randint(0,255),random.randint(0,255)),(random.randint(0,255),random.randint(0,255),random.randint(0,255))]
   for region in regions:   
       random.shuffle(colors)
       for i in range(len(region)):
@@ -208,7 +209,7 @@ def drawImage(fileName, regions):
         draw.polygon(region[i].flipped(), fill=colors[i])
   img.save(fileName, quality=80, optimize=False)
 
-def runGenerate(output, type):
+def runGenerate(output, type, colors=None):
     initialRectangle = Region([Point(0,0),Point(width/2,0),Point(width/2,height/2),Point(0,height/2)])
     firstSplit = initialRectangle.fourthRectSect()
     thisSplit = firstSplit
@@ -234,7 +235,7 @@ def runGenerate(output, type):
           for ent in list:
             nextSplit.append(ent.quadrisect(i))
       thisSplit = nextSplit
-    drawImage(output, thisSplit)
+    drawImage(output, thisSplit, colors=colors)
 
 
 
