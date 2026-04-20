@@ -1,8 +1,8 @@
-import sys, math, random, os, time, copy
+import sys, math, random, os, time
 from PIL import Image, ImageDraw, UnidentifiedImageError
 
-width = int(4096)
-height = int(4096)
+width = int(1024)
+height = int(1024)
 
 class Point:
   def __init__(self, x, y):
@@ -206,7 +206,7 @@ def drawImage(fileName, regions):
         draw.polygon(region[i].xMirrored(), fill=colors[i])
         draw.polygon(region[i].yMirrored(), fill=colors[i])
         draw.polygon(region[i].flipped(), fill=colors[i])
-  img.save(fileName,quality=80)
+  img.save(fileName, quality=80, optimize=False)
 
 def runGenerate(output, type):
     initialRectangle = Region([Point(0,0),Point(width/2,0),Point(width/2,height/2),Point(0,height/2)])
@@ -221,20 +221,19 @@ def runGenerate(output, type):
     else:
       div = 2
     for i in range(div):
+      nextSplit = []
       if i == 0:
         for ent in thisSplit:
           nextSplit.append(ent.quadrisect(i))
-        thisSplit=[copy.deepcopy(region) for region in nextSplit]
       elif i == div-1:
         for list in thisSplit:
           for ent in list:
             nextSplit.append(ent.lastSect(i))
-        thisSplit=[copy.deepcopy(region) for region in nextSplit]
       else:
         for list in thisSplit:
           for ent in list:
             nextSplit.append(ent.quadrisect(i))
-        thisSplit=[copy.deepcopy(region) for region in nextSplit]
+      thisSplit = nextSplit
     drawImage(output, thisSplit)
 
 

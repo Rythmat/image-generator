@@ -55,7 +55,7 @@ def image_producer():
         with queue_lock:
             for type, queue in queues.items():
                 if len(queue) < BUFFER_SIZE:
-                    filename = f"{IMAGE_DIR}/{type}_{uuid.uuid4().hex}.png"
+                    filename = f"{IMAGE_DIR}/{type}_{uuid.uuid4().hex}.jpg"
                     executor.submit(generate_async, filename, type)
         time.sleep(1)
 
@@ -85,7 +85,7 @@ def generate():
         if q_type in current_images:
             img = current_images[q_type]
             if img and os.path.exists(img):
-                response = make_response(send_file(img, mimetype="image/png"))
+                response = make_response(send_file(img, mimetype="image/jpeg"))
                 response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
                 return response
     return "No image ready yet", 503
