@@ -17,7 +17,6 @@ function App() {
   const [colorMode, setColorMode] = useState("random");
   const [colors, setColors] = useState([randomHex(), randomHex(), randomHex()]);
   const [colorDropdownOpen, setColorDropdownOpen] = useState(false);
-  const [loading, setLoading] = useState(false);
   const intervalRef = useRef(null);
   const colorRefs = [useRef(null), useRef(null), useRef(null)];
 
@@ -25,11 +24,9 @@ function App() {
     const img = new Image();
     img.onload = () => {
       setImageSrc(url);
-      setLoading(false);
     };
     img.onerror = () => {
       console.error("Image failed to load:", url);
-      setLoading(false);
     };
     img.src = url;
   }, []);
@@ -49,16 +46,21 @@ function App() {
     return () => clearInterval(intervalRef.current);
   }, [type, paused, colorMode, fetchImage]);
 
-  // Custom mode: generate on-demand when colors or type change
+  // Custom mode: poll with fixed colors
   useEffect(() => {
-    if (colorMode !== "custom") return;
+    if (colorMode !== "custom" || paused) return;
 
-    setLoading(true);
     const colorParam = colors.map(c => c.replace("#", "")).join(",");
-    const timestamp = new Date().getTime();
-    const url = `https://earth-mandalate.onrender.com/generate?type=${type}&colors=${colorParam}&t=${timestamp}`;
-    fetchImage(url);
-  }, [type, colors, colorMode, fetchImage]);
+    const updateImage = () => {
+      const timestamp = new Date().getTime();
+      const url = `https://earth-mandalate.onrender.com/generate?type=${type}&colors=${colorParam}&t=${timestamp}`;
+      fetchImage(url);
+    };
+
+    updateImage();
+    intervalRef.current = setInterval(updateImage, 5000);
+    return () => clearInterval(intervalRef.current);
+  }, [type, colors, colorMode, paused, fetchImage]);
 
   const togglePause = () => {
     setPaused((prev) => !prev);
@@ -98,7 +100,6 @@ function App() {
                       onClick={() => {
                         setColorMode("custom");
                         setColorDropdownOpen(false);
-                        clearInterval(intervalRef.current);
                       }}
                     >
                       Choose Colors
@@ -137,10 +138,7 @@ function App() {
 
         <div className="center">
           {imageSrc ? (
-            <>
-              <img src={imageSrc} alt="Earth Mandala" />
-              {loading && <div className="loading-overlay">Generating...</div>}
-            </>
+            <img src={imageSrc} alt="Earth Mandala" />
           ) : (
             <p>Loading...</p>
           )}
